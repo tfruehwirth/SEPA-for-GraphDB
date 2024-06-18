@@ -148,14 +148,17 @@ public class SPARQL11Protocol implements Closeable {
 			// Status code
 			responseCode = httpResponse.getStatusLine().getStatusCode();
 
-			// Body
-			responseEntity = httpResponse.getEntity();
-			responseBody = EntityUtils.toString(responseEntity, Charset.forName("UTF-8"));
+			if(responseCode != 204) { // 204 = no content, i.e., responseBody and response Entity are null and shall not be processed any further
+				// Body
+				responseEntity = httpResponse.getEntity();
+				responseBody = EntityUtils.toString(responseEntity, Charset.forName("UTF-8"));
 
-			Logging.logger.trace(String.format("Response code: %d", responseCode));
-			Logging.logger.trace(String.format("Response boby: %s", responseBody));
+				Logging.logger.trace(String.format("Response code: %d", responseCode));
 
-			EntityUtils.consume(responseEntity);
+				Logging.logger.trace(String.format("Response boby: %s", responseBody));
+
+				EntityUtils.consume(responseEntity);
+			}
 		} catch (Exception e) {
 			errorResponse = new ErrorResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, e.getClass().getName(),
 					e.getMessage());
